@@ -11,6 +11,8 @@ def app(environ, start_response):
     status_text = {
         200: "200 OK",
         404: "404 Not Found",
+        405: "405 Method Not Allowed",
+        500: "500 Internal Server Error",
     }.get(status_code, f"{status_code} UNKNOWN")
 
     start_response(status_text, [("Content-Type", "text/plain")])

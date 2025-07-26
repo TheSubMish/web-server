@@ -90,6 +90,8 @@ class Server:
 
             # Send HTTP response
             self.send_response(client_socket, response_data, response_body)
+            
+            print(f"{method} {path} - {response_data[0]}")
 
         except Exception as e:
             print(f"Error handling request: {e}")

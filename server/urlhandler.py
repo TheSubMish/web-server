@@ -33,8 +33,8 @@ class UrlHandler:
             if match:
                 if method in route_info["methods"]:
                     # Add URL parameters to request
-                    request.url_params = match.groupdict()
-                return route_info["handler"](request)
+                    request["url_params"] = match.groupdict()
+                return route_info["handler"](request, **request.get("url_params", {}))
             else:
                 return self.method_not_allowed(request)
 

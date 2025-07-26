@@ -15,3 +15,13 @@ def about_handler(request):
 
 
 url_handler.add_route("/about", about_handler)
+
+
+def user_handler(request, id):
+
+    if id:
+        return f"User profile for user {id}", 200
+    return "User not found", 404
+
+
+url_handler.add_route("/user/<id>", user_handler)

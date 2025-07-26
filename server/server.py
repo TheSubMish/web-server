@@ -28,6 +28,7 @@ class Server:
         self.socket.listen(5)
         self.running = True
         print(f"Server running on http://{self.host}:{self.port}")
+        import main
 
     def accept_connections(self):
 

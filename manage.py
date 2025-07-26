@@ -1,7 +1,7 @@
 import sys
 
 
-def main():
+def main() -> None:
     """Run administrative tasks."""
     try:
         from managements.execute import ExecuteCommand
@@ -11,7 +11,7 @@ def main():
             "available on your PYTHONPATH environment variable? Did you forget to activate a virtual environment?"
         )
 
-    command = ExecuteCommand(sys.argv)
+    command: ExecuteCommand = ExecuteCommand(sys.argv)
     command.execute()
 
 

@@ -4,7 +4,11 @@ from wsgi import app
 
 
 @start_with_reloader
-def run_server(host="127.0.0.1", port=8000):
-    Server(app, host=host, port=port).run()
+def run_server(host: str = "127.0.0.1", port: int = 8000) -> None:
+    def wsgi_app(environ, start_response):
+        def start_response_wrapper(status, headers, exc_info=None):
+            return start_response(status, headers)
 
-    # start_with_reloader(run_server)
+        return app(environ, start_response_wrapper)
+
+    Server(wsgi_app, host=host, port=port).run()

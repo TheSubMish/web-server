@@ -1,40 +1,41 @@
 import sys
+from typing import List, Callable, Optional
 
 # Ensure run_server is properly imported and defined
 try:
     from managements.command.runserver import run_server
 except ImportError:
-    run_server = None
+    run_server: Optional[Callable[[str, int], None]] = None
 
 
 class ExecuteCommand:
 
-    def __init__(self, args):
-        self.args = args
+    def __init__(self, args: List[str]) -> None:
+        self.args: List[str] = args
 
-    def _run_server(self):
+    def _run_server(self) -> None:
         try:
-            host = self.args[2] if len(self.args) > 2 else "127.0.0.1"
-            port = int(self.args[3]) if len(self.args) > 3 else 8000
+            host: str = self.args[2] if len(self.args) > 2 else "127.0.0.1"
+            port: int = int(self.args[3]) if len(self.args) > 3 else 8000
             if callable(run_server):
-                run_server(host=host, port=port)
+                run_server(host, port)
             else:
                 print("Error: run_server is not defined or not callable.")
                 sys.exit(1)
         except (IndexError, ValueError):
-            host = "127.0.0.1"
-            port = 8000
+            host: str = "127.0.0.1"
+            port: int = 8000
 
         if callable(run_server):
-            run_server(host=host, port=port)
+            run_server(host, port)
 
-    def execute(self):
+    def execute(self) -> None:
 
         if not self.args or len(self.args) < 2:
             print("command not provided. Use 'runserver' to start the server.")
             sys.exit(1)
 
-        commands = {
+        commands: dict[str, Callable[[], None]] = {
             "runserver": self._run_server,
         }
 
@@ -42,5 +43,5 @@ class ExecuteCommand:
             print(f"Unknown command: {self.args[1]}")
             sys.exit(1)
 
-        command = commands[self.args[1]]
+        command: Callable[[], None] = commands[self.args[1]]
         command()

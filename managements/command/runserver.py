@@ -1,6 +1,6 @@
 from server.server import Server
 from server.reloader import start_with_reloader
-from app import app
+from wsgi import app
 
 
 @start_with_reloader

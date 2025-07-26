@@ -1,12 +1,25 @@
-from server.server import Server
-from server.reloader import start_with_reloader
-from app import app
+from server.urlhandler import url_handler
 
 
-if __name__ == "__main__":
+def home_handler(request):
+    return "Welcome to the home page!", 200
 
-    def run_server():
-        # Your server.run() here
-        Server(app).run()
 
-    start_with_reloader(run_server)
+url_handler.add_route("/", home_handler)
+
+
+def about_handler(request):
+    return "This is the about page.", 200
+
+
+url_handler.add_route("/about", about_handler)
+
+
+def user_handler(request, id):
+
+    if id:
+        return f"User profile for user {id}", 200
+    return "User not found", 404
+
+
+url_handler.add_route("/user/<id>", user_handler)

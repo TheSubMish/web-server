@@ -45,3 +45,7 @@ class UrlHandler:
 
     def method_not_allowed(self, request):
         return "405 Method Not Allowed", 405
+
+
+
+url_handler = UrlHandler()

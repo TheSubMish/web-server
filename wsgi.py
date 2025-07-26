@@ -1,4 +1,4 @@
-from urls import url_handler
+from server.urlhandler import url_handler
 
 
 def app(environ, start_response):

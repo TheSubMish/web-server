@@ -1,3 +1,4 @@
+import json
 import socket
 import threading
 from urllib.parse import parse_qs
@@ -180,12 +181,16 @@ class Server:
         status: str = response_data[0]
         headers: List[Tuple[str, str]] = response_data[1]
 
+        # Check if Content-Type is application/json
+        is_json = any(
+            header_name.lower() == "content-type" and "application/json" in header_value.lower()
+            for header_name, header_value in headers
+        )
+
         # Build HTTP response
         response: str = f"HTTP/1.1 {status}\r\n"
-
         for header_name, header_value in headers:
             response += f"{header_name}: {header_value}\r\n"
-
         response += "\r\n"  # End of headers
 
         # Send response headers
@@ -193,7 +198,10 @@ class Server:
 
         # Send response body
         for data in response_body:
-            if isinstance(data, str):
+            if is_json and not isinstance(data, (bytes, bytearray)):
+                # Serialize to JSON if not already bytes
+                client_socket.send(json.dumps(data).encode("utf-8"))
+            elif isinstance(data, str):
                 client_socket.send(data.encode("utf-8"))
             else:
                 client_socket.send(data)

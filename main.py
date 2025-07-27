@@ -6,7 +6,7 @@ from server.urlhandler import url_handler
 
 def home_handler(request: Any) -> Response:
     return Response(
-        body="<h1>Welcome to the home page!</h1><p>This is the main page of our website.</p>",
+        body={"json": "sending json data"},
         status=200,
         headers=[("Content-Type", "text/html"), ("X-Custom-Header", "Home-Page")],
     )

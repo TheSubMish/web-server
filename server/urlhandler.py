@@ -1,5 +1,7 @@
 import re
-from typing import Callable, Dict, List, Optional, Any, Tuple
+from typing import Callable, Dict, List, Optional, Any
+
+from server.response import Response
 
 
 class UrlHandler:
@@ -30,28 +32,59 @@ class UrlHandler:
 
     def handle_request(
         self, path: str, request: Dict[str, Any], method: str = "GET"
-    ) -> Any:
+    ) -> Response:
         if path in self.routes:
             route_info: Dict[str, Any] = self.routes[path]
             if method in route_info["methods"]:
-                return route_info["handler"](request)
+                result = route_info["handler"](request)
+                return self._convert_to_response(result)
+
+            else:
+                return self.method_not_allowed(request)
 
         for pattern, route_info in self.regex_routes.items():
             match: Optional[re.Match[str]] = re.match(pattern, path)
             if match:
                 if method in route_info["methods"]:
                     request["url_params"] = match.groupdict()
-                return route_info["handler"](request, **request.get("url_params", {}))
+                    result = route_info["handler"](
+                        request, **request.get("url_params", {})
+                    )
+                    return self._convert_to_response(result)
             else:
                 return self.method_not_allowed(request)
 
         return self.not_found(request)
 
-    def not_found(self, request: Dict[str, Any]) -> Tuple[str, int]:
-        return "404 Not Found", 404
+    def _convert_to_response(self, result: Any) -> Response:
+        """Convert handler result to Response object"""
+        if isinstance(result, Response):
+            return result
+        elif isinstance(result, tuple):
+            if len(result) == 2:
+                body, status_code = result
+                return Response(body=body, status=status_code)
+            elif len(result) == 3:
+                body, status_code, headers = result
+                return Response(body=body, status=status_code, headers=headers)
+            else:
+                return Response(body=str(result))
+        elif isinstance(result, str):
+            return Response(body=result)
+        else:
+            return Response(body=str(result))
 
-    def method_not_allowed(self, request: Dict[str, Any]) -> Tuple[str, int]:
-        return "405 Method Not Allowed", 405
+    def not_found(self, request: Dict[str, Any]) -> Response:
+        return Response(
+            body="<h1>404 Not Found</h1><p>The requested page was not found.</p>",
+            status=4,
+        )
+
+    def method_not_allowed(self, request: Dict[str, Any]) -> Response:
+        return Response(
+            body="<h1>405 Method Not Allowed</h1><p>Method not allowed for this resource.</p>",
+            status=405,
+        )
 
 
 url_handler: UrlHandler = UrlHandler()

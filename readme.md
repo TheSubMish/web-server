@@ -21,17 +21,39 @@ Stay tuned! Setup instructions and usage examples will be added as development p
 
 1. **Install dependencies:**
 
-    ```bash
-    pip install -r requirements.txt
-    ```
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 2. **Start the development server:**
 
-    ```bash
-    python manage.py runserver
-    ```
+   ```bash
+   python manage.py runserver
+   ```
 
 The server will start and be accessible at `http://127.0.0.1:8000/` by default.
+
+3. **Creating a view:**
+
+   ```python
+
+   from server.response import Response
+   from server.urlhandler import url_handler
+
+   def home_page(request):
+       return Response(
+           body={"json": "sending json data"},
+           status=200,
+           headers=[("Content-Type", "application/json")],
+       )
+   ```
+
+4. **Add url**
+
+   ```python
+   from server.urlhandler import url_handler
+   url_handler.add_route("/", home_page)
+   ```
 
 ## Contributing
 

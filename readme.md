@@ -33,7 +33,13 @@ Stay tuned! Setup instructions and usage examples will be added as development p
 
 The server will start and be accessible at `http://127.0.0.1:8000/` by default.
 
-3. **Creating a view:**
+3. **Create a main file**
+
+   ```bash
+   touch main.py
+   ```
+
+4. **Creating a view:**
 
    ```python
 
@@ -48,11 +54,39 @@ The server will start and be accessible at `http://127.0.0.1:8000/` by default.
        )
    ```
 
-4. **Add url**
+5. **Add url**
 
    ```python
    from server.urlhandler import url_handler
    url_handler.add_route("/", home_page)
+   ```
+
+6. **Add middleware**
+
+   ```python
+   from server.middleware import MiddlewareHandler
+   class ResponseTimeMiddleware(MiddlewareHandler):
+    def __init__(self, app: Any) -> None:
+        self.app = app
+
+    def __call__(self, environ: dict, start_response: Any) -> Any:
+        import time
+
+        start_time = time.time()
+        response_body = self.app(environ, start_response)
+        duration = time.time() - start_time
+
+        print(f"Response Time: {duration:.4f} seconds")
+        return response_body
+   ```
+
+   **Append to list**
+
+   ```python
+   middlewares = [
+      MiddlewareHandler,
+      ResponseTimeMiddleware,
+   ]
    ```
 
 ## Contributing

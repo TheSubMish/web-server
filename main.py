@@ -1,5 +1,6 @@
 from typing import Any
 
+from server.middleware import MiddlewareHandler
 from server.response import Response
 from server.urlhandler import url_handler
 
@@ -31,3 +32,24 @@ def user_handler(request: Any, id: str) -> Response:
 
 
 url_handler.add_route("/user/<id>", user_handler)
+
+
+class ResponseTimeMiddleware(MiddlewareHandler):
+    def __init__(self, app: Any) -> None:
+        self.app = app
+
+    def __call__(self, environ: dict, start_response: Any) -> Any:
+        import time
+
+        start_time = time.time()
+        response_body = self.app(environ, start_response)
+        duration = time.time() - start_time
+
+        print(f"Response Time: {duration:.4f} seconds")
+        return response_body
+
+
+middlewares = [
+    MiddlewareHandler,
+    ResponseTimeMiddleware,
+]

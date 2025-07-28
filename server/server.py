@@ -47,7 +47,10 @@ class Server:
         self.socket.listen(5)
         self.running = True
         print(f"Server running on http://{self.host}:{self.port}")
-        import main
+        try:
+            import main
+        except ImportError:
+            pass
 
     def accept_connections(self) -> None:
         if self.socket is None:
@@ -118,8 +121,6 @@ class Server:
             # Send HTTP response
             self.send_response(client_socket, response_data, response_body)
 
-            print(f"{method} {path} - {response_data[0]}")
-
         except Exception as e:
             print(f"Error handling request: {e}")
         finally:
@@ -183,7 +184,8 @@ class Server:
 
         # Check if Content-Type is application/json
         is_json = any(
-            header_name.lower() == "content-type" and "application/json" in header_value.lower()
+            header_name.lower() == "content-type"
+            and "application/json" in header_value.lower()
             for header_name, header_value in headers
         )
 

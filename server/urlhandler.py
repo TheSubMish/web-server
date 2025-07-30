@@ -1,7 +1,8 @@
 import re
 from typing import Callable, Dict, List, Optional, Any
 
-from server.response import Response
+from server.response import Response, JSONResponse
+from server.request import Request
 
 
 class UrlHandler:
@@ -30,8 +31,28 @@ class UrlHandler:
         else:
             self.routes[path] = {"handler": handler, "methods": methods}
 
+    def get(self, path: str, handler: Callable):
+        """Add GET route"""
+        self.add_route(path, handler, ["GET"])
+
+    def post(self, path: str, handler: Callable):
+        """Add POST route"""
+        self.add_route(path, handler, ["POST"])
+
+    def put(self, path: str, handler: Callable):
+        """Add PUT route"""
+        self.add_route(path, handler, ["PUT"])
+
+    def patch(self, path: str, handler: Callable):
+        """Add PATCH route"""
+        self.add_route(path, handler, ["PATCH"])
+
+    def delete(self, path: str, handler: Callable):
+        """Add DELETE route"""
+        self.add_route(path, handler, ["DELETE"])
+
     def handle_request(
-        self, path: str, request: Dict[str, Any], method: str = "GET"
+        self, path: str, request: Request, method: str = "GET"
     ) -> Response:
         if path in self.routes:
             route_info: Dict[str, Any] = self.routes[path]
@@ -46,10 +67,8 @@ class UrlHandler:
             match: Optional[re.Match[str]] = re.match(pattern, path)
             if match:
                 if method in route_info["methods"]:
-                    request["url_params"] = match.groupdict()
-                    result = route_info["handler"](
-                        request, **request.get("url_params", {})
-                    )
+
+                    result = route_info["handler"](request, **request.query_params)
                     return self._convert_to_response(result)
             else:
                 return self.method_not_allowed(request)
@@ -57,8 +76,10 @@ class UrlHandler:
         return self.not_found(request)
 
     def _convert_to_response(self, result: Any) -> Response:
-        """Convert handler result to Response object"""
+
         if isinstance(result, Response):
+            return result
+        elif hasattr(result, "to_wsgi_response"):
             return result
         elif isinstance(result, tuple):
             if len(result) == 2:
@@ -74,13 +95,13 @@ class UrlHandler:
         else:
             return Response(body=str(result))
 
-    def not_found(self, request: Dict[str, Any]) -> Response:
+    def not_found(self, request: Request) -> Response:
         return Response(
             body="<h1>404 Not Found</h1><p>The requested page was not found.</p>",
             status=4,
         )
 
-    def method_not_allowed(self, request: Dict[str, Any]) -> Response:
+    def method_not_allowed(self, request: Request) -> Response:
         return Response(
             body="<h1>405 Method Not Allowed</h1><p>Method not allowed for this resource.</p>",
             status=405,

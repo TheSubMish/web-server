@@ -6,6 +6,7 @@ from io import StringIO
 import sys
 import signal
 from typing import Callable, Dict, Any, List, Tuple, Optional
+from server.request import Request
 
 
 class Server:
@@ -105,7 +106,6 @@ class Server:
                 method, path, query_string, headers, request_data
             )
 
-            # Call WSGI application
             response_data: List[Any] = []
 
             def start_response(
@@ -135,15 +135,30 @@ class Server:
         raw_request: str,
     ) -> Dict[str, Any]:
 
-        query_dict: Dict[str, List[str]] = parse_qs(query_string)
+        content_length = int(headers.get("CONTENT_LENGTH", "0"))
 
-        request: Dict[str, Any] = {
-            "method": method,
-            "path": path,
-            "query_params": query_dict,
-            "HTTP_HEADERS": headers,
-            "RAW_REQUEST": raw_request,
-        }
+        body = ""
+        if content_length > 0:
+            header_end = raw_request.find("\r\n\r\n")
+            if header_end != -1:
+                body = raw_request[header_end + 4 :]
+                # Ensure we have the full body
+                if self.socket and len(body.encode("utf-8")) < content_length:
+                    # Read additional data if needed
+                    remaining = content_length - len(body.encode("utf-8"))
+                    body += self.socket.recv(remaining).decode(
+                        "utf-8", errors="replace"
+                    )
+
+        data = self.parse_json(body, headers.get("CONTENT_TYPE", ""))
+
+        request: Request = Request(
+            method=method,
+            path=path,
+            headers=list(headers.items()),
+            body=raw_request.encode("utf-8"),
+            data=data,
+        )
 
         """Create WSGI environ dictionary"""
         environ: Dict[str, Any] = {
@@ -171,6 +186,16 @@ class Server:
                 environ[f"HTTP_{key}"] = value
 
         return environ
+
+    def parse_json(self, body: str, content_type: str) -> Optional[Dict[str, Any]]:
+        """Parse JSON body if content type is application/json"""
+        if "application/json" in content_type.lower() and body.strip():
+            try:
+                return json.loads(body)
+            except json.JSONDecodeError as e:
+                print(f"JSON parsing error: {e}")
+                return None
+        return None
 
     def send_response(
         self,

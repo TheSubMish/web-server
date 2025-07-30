@@ -1,29 +1,30 @@
 from typing import Any
 
 from server.middleware import MiddlewareHandler
-from server.response import Response
+from server.response import Response, JSONResponse
+from server.request import Request
 from server.urlhandler import url_handler
 
 
-def home_handler(request: Any) -> Response:
-    return Response(
-        body={"json": "sending json data"},
+def home_handler(request: Request) -> JSONResponse:
+    return JSONResponse(
+        data={"json": "sending json data"},
         status=200,
         headers=[("Content-Type", "text/html"), ("X-Custom-Header", "Home-Page")],
     )
 
 
-url_handler.add_route("/", home_handler)
+url_handler.get("/", home_handler)
 
 
-def about_handler(request: Any) -> Response:
+def about_handler(request: Request) -> Response:
     return Response(body="<h1>About Us</h1><p>This is the about page.</p>", status=200)
 
 
-url_handler.add_route("/about", about_handler)
+url_handler.get("/about", about_handler)
 
 
-def user_handler(request: Any, id: str) -> Response:
+def user_handler(request: Request, id: str) -> Response:
     if id:
         return Response(
             body=f"<h1>User Profile</h1><p>User profile for user {id}</p>", status=200
@@ -31,7 +32,21 @@ def user_handler(request: Any, id: str) -> Response:
     return Response(body="<h1>404 Not Found</h1><p>User not found</p>", status=404)
 
 
-url_handler.add_route("/user/<id>", user_handler)
+url_handler.get("/user/<id>", user_handler)
+
+
+def contact_handler(request: Request) -> JSONResponse:
+
+    data = request.data
+
+    return JSONResponse(
+        data={"message": "Contact form submitted successfully", "data": data},
+        status=201,
+        headers=[("Content-Type", "application/json")],
+    )
+
+
+url_handler.post("/contact", contact_handler)
 
 
 class ResponseTimeMiddleware(MiddlewareHandler):

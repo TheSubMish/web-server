@@ -49,6 +49,82 @@ def contact_handler(request: Request) -> JSONResponse:
 url_handler.post("/contact", contact_handler)
 
 
+def user_update_handler(request: Request, id: str) -> JSONResponse:
+    data = request.data
+
+    print(data)
+
+    if id:
+        return JSONResponse(
+            data={"message": f"User {id} updated successfully", "data": data},
+            status=200,
+            headers=[("Content-Type", "application/json")],
+        )
+    return JSONResponse(
+        data={"error": "User ID is required"},
+        status=400,
+        headers=[("Content-Type", "application/json")],
+    )
+
+
+url_handler.put("/user/<id>/update", user_update_handler)
+
+
+def user_partial_update_handler(request: Request, id: str) -> JSONResponse:
+
+    data = request.data
+
+    if id:
+        return JSONResponse(
+            data={"message": f"User {id} partially updated successfully", "data": data},
+            status=200,
+            headers=[("Content-Type", "application/json")],
+        )
+
+    return JSONResponse(
+        data={"error": "User ID is required"},
+        status=400,
+        headers=[("Content-Type", "application/json")],
+    )
+
+
+url_handler.patch("/user/<id>/partial-update", user_partial_update_handler)
+
+
+def user_delete_handler(request: Request, id: str) -> JSONResponse:
+    if id:
+        return JSONResponse(
+            data={"message": f"User {id} deleted successfully"},
+            status=200,
+            headers=[("Content-Type", "application/json")],
+        )
+    return JSONResponse(
+        data={"error": "User ID is required"},
+        status=400,
+        headers=[("Content-Type", "application/json")],
+    )
+
+
+url_handler.delete("/user/<id>/delete", user_delete_handler)
+
+
+def get_double_param_check_handler(
+    request: Request, number: int, name: str
+) -> JSONResponse:
+    if number and name:
+        return JSONResponse(
+            data={"message": f"Hello {name}, your number is {number}"},
+            status=200,
+            headers=[("Content-Type", "application/json")],
+        )
+    return JSONResponse(
+        data={"error": "Invalid parameters"},
+        status=400,
+        headers=[("Content-Type", "application/json")],
+    )
+
+url_handler.get("/double/<number>/<name>", get_double_param_check_handler)
+
 class ResponseTimeMiddleware(MiddlewareHandler):
     def __init__(self, app: Any) -> None:
         self.app = app

@@ -12,6 +12,7 @@ class Request:
         self.body = body
         self.data = data
         self.query_params = self.parse_query_params()
+        self.url_params: dict = {}
 
     def get_header(self, name: str) -> Optional[str]:
         for header in self.headers:

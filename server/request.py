@@ -3,8 +3,42 @@ import json
 
 
 class Request:
+    """
+    Represents an HTTP request.
+
+    Attributes:
+        method (str): The HTTP method (e.g., 'GET', 'POST').
+        path (str): The request path, possibly including query parameters.
+        headers (list[tuple[str, str]]): A list of (header_name, header_value) tuples.
+        body (bytes): The raw request body.
+        data (Optional[dict]): Parsed data from the request body, if available.
+        query_params (dict): Dictionary of parsed query parameters from the path.
+        url_params (dict): Dictionary of URL parameters, to be set externally.
+
+    Methods:
+        get_header(name: str) -> Optional[str]:
+            Retrieve the value of a header by name (case-insensitive).
+
+        get_query_param(name: str) -> Optional[str]:
+            Retrieve the value of a query parameter by name.
+
+        get_json_body() -> Optional[dict]:
+            Parse and return the JSON body if the Content-Type is 'application/json'.
+
+        parse_data() -> dict:
+            Parse the request body as JSON and return a dictionary.
+
+        parse_query_params() -> dict:
+            Parse and return the query parameters from the request path as a dictionary.
+    """
+
     def __init__(
-        self, method: str, path: str, headers: list[tuple[str, str]], body: bytes, data: Optional[dict] = None
+        self,
+        method: str,
+        path: str,
+        headers: list[tuple[str, str]],
+        body: bytes,
+        data: Optional[dict] = None,
     ):
         self.method = method
         self.path = path

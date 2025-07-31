@@ -10,6 +10,41 @@ from server.request import Request
 
 
 class Server:
+    """
+    A simple multi-threaded WSGI-compatible HTTP server.
+
+    This Server class listens for incoming HTTP connections, parses requests,
+    creates WSGI environ dictionaries, and delegates request handling to a WSGI app.
+    It supports graceful shutdown via SIGINT and handles each request in a separate thread.
+
+    Attributes:
+        wsgi_app (Callable): The WSGI application callable.
+        host (str): The hostname or IP address to bind the server to.
+        port (int): The port number to listen on.
+        socket (Optional[socket.socket]): The server's listening socket.
+        running (bool): Indicates if the server is running.
+
+    Methods:
+        __init__(wsgi_app, host, port): Initializes the server and sets up signal handling.
+        
+        _graceful_shutdown(signum, frame): Handles graceful shutdown on SIGINT.
+        
+        start_server(): Initializes and starts the server socket.
+        
+        accept_connections(): Accepts incoming connections and spawns threads for requests.
+        
+        handle_request(client_socket): Handles an individual HTTP request.
+        
+        create_wsgi_environ(method, path, query_string, headers, raw_request): Builds WSGI environ dict.
+        
+        parse_json(body, content_type): Parses JSON body if content type is application/json.
+        
+        send_response(client_socket, response_data, response_body): Sends HTTP response to client.
+        
+        stop_server(): Stops the server and closes the socket.
+        
+        run(): Starts the server and begins accepting connections.
+    """
     def __init__(
         self,
         wsgi_app: Callable[

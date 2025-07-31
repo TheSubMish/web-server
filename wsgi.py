@@ -6,6 +6,23 @@ from server.request import Request
 def app(
     environ: Dict[str, Any], start_response: Callable[[str, List[tuple]], None]
 ) -> List[bytes]:
+    """
+    WSGI application entry point.
+
+    Args:
+        environ (Dict[str, Any]): The WSGI environment dictionary containing request data.
+        start_response (Callable[[str, List[tuple]], None]): The WSGI callback for starting the HTTP response.
+
+    Returns:
+        List[bytes]: The response body as a list of byte strings, suitable for WSGI servers.
+
+    Description:
+        This function acts as the main WSGI application callable. It extracts the request object from the environment,
+        determines the request path and method, and delegates handling to a URL handler. Depending on the type of response
+        object returned, it either calls a custom `to_wsgi_response` method or constructs a standard WSGI response using
+        status codes and headers.
+    """
+
     request: Request = environ.get("request", {})
     path: str = request.path
     method: str = request.method.upper()

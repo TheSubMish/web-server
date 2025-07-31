@@ -6,6 +6,65 @@ from server.request import Request
 
 
 class UrlHandler:
+    """
+    UrlHandler provides a simple routing mechanism for a web server, supporting both static and parameterized URL paths.
+
+    Features:
+        - Register routes for HTTP methods (GET, POST, PUT, PATCH, DELETE).
+        - Supports static paths and dynamic paths with parameters (e.g., '/user/<int:id>').
+        - Converts URL parameters to specified types (int, float, str).
+        - Handles requests by matching paths and invoking corresponding handlers.
+        - Returns appropriate HTTP responses for not found, method not allowed, and server errors.
+
+    Attributes:
+        routes (Dict[str, Dict[str, Any]]): Stores static routes.
+        regex_routes (Dict[str, Dict[str, Any]]): Stores parameterized routes with regex patterns.
+
+    Methods:
+        add_route(path, handler, methods=None):
+            Registers a route with the given path, handler, and allowed HTTP methods.
+
+        get(path, handler):
+            Registers a GET route.
+
+        post(path, handler):
+            Registers a POST route.
+
+        put(path, handler):
+            Registers a PUT route.
+
+        patch(path, handler):
+            Registers a PATCH route.
+
+        delete(path, handler):
+            Registers a DELETE route.
+
+        handle_request(path, request, method="GET"):
+            Handles an incoming request, matches the path, and invokes the appropriate handler.
+
+        not_found(request):
+            Returns a 404 Not Found response.
+
+        method_not_allowed(request):
+            Returns a 405 Method Not Allowed response.
+
+        server_error(request):
+            Returns a 500 Internal Server Error response.
+
+    Internal Methods:
+        _convert_path_to_regex(path):
+            Converts a parameterized path to a regex pattern.
+
+        _extract_param_types(path):
+            Extracts parameter types from a parameterized path.
+
+        _convert_param_types(params, param_types):
+            Converts string parameters to their specified types.
+
+        _convert_to_response(result):
+            Converts handler results to a Response object.
+    """
+
     def __init__(self):
         self.routes: Dict[str, Dict[str, Any]] = {}
         self.regex_routes: Dict[str, Dict[str, Any]] = {}
@@ -51,7 +110,7 @@ class UrlHandler:
 
         # Replace untyped parameters like <id> (default to str)
         pattern = re.sub(r"<(\w+)>", r"(?P<\1>[^/]+)", pattern)
-        
+
         print(pattern)
 
         return f"^{pattern}$"

@@ -2,6 +2,28 @@ from typing import Callable, Any
 
 
 class MiddlewareHandler:
+    """
+    MiddlewareHandler is a WSGI middleware class that wraps a WSGI application to provide
+    request and response logging functionality.
+
+    Attributes:
+        app (Callable): The WSGI application to be wrapped.
+
+    Methods:
+        __init__(app: Callable) -> None:
+            Initializes the middleware with the given WSGI application.
+
+        __call__(environ: dict, start_response: Callable) -> Any:
+            Handles the WSGI request, logs request details, wraps the start_response
+            to capture the response status, and logs the response status.
+
+        process_request(environ: dict) -> None:
+            Logs the HTTP request method and path from the WSGI environ.
+
+        process_response(status: str) -> None:
+            Logs the HTTP response status.
+    """
+
     def __init__(self, app: Callable) -> None:
         self.app = app
 
@@ -26,7 +48,6 @@ class MiddlewareHandler:
 
     def process_response(self, status: str) -> None:
         print(f"Response Status: {status}")
-
 
 
 def apply_middlewares(app, middlewares):

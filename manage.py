@@ -2,7 +2,17 @@ import sys
 
 
 def main() -> None:
-    """Run administrative tasks."""
+    """
+    Entry point for running administrative tasks.
+
+    This function attempts to import the `ExecuteCommand` class from the `managements.execute` module.
+    If the import fails, it raises an ImportError with a helpful message about possible causes.
+    Upon successful import, it creates an instance of `ExecuteCommand` with the command-line arguments
+    and executes the command.
+
+    Raises:
+        ImportError: If the `managements.execute` module cannot be imported.
+    """
     try:
         from managements.execute import ExecuteCommand
     except ImportError as exc:

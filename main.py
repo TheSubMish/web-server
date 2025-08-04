@@ -144,3 +144,6 @@ middlewares = [
     MiddlewareHandler,
     ResponseTimeMiddleware,
 ]
+
+
+USE_SQLITE = True

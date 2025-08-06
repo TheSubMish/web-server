@@ -1,6 +1,14 @@
 import sqlite3
 import os
 
+from typing import Optional
+from sqlalchemy import create_engine, Engine
+from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.ext.declarative import declarative_base
+
+
+Base = declarative_base()
+
 
 class DatabaseConnection:
     """
@@ -19,7 +27,16 @@ class DatabaseConnection:
     """
 
     def __init__(self) -> None:
+        self.db_file: str = "default.db"
         self.use_sqlite: bool = self._check_db()
+        self.engine: Optional[Engine] = None
+        self.SessionLocal = None
+
+        if self.use_sqlite:
+            self.engine = self._create_sqlalchemy_engine(self.db_file)
+            self.SessionLocal = sessionmaker(
+                autocommit=False, autoflush=False, bind=self.engine
+            )
 
     def _check_db(self) -> bool:
 
@@ -46,6 +63,17 @@ class DatabaseConnection:
             print(e)
         return conn
 
+    def _create_sqlalchemy_engine(self, db_file: str) -> Engine:
+        if not os.path.exists(db_file):
+            open(db_file, "w").close()
+
+        db_url = f"sqlite:///{db_file}"
+
+        engine = create_engine(
+            db_url, connect_args={"check_same_thread": False}, echo=False
+        )
+        return engine
+
     def get_connection(self) -> sqlite3.Connection:
         if self.use_sqlite:
             conn = self._create_sqlite_connection("default.db")
@@ -54,6 +82,30 @@ class DatabaseConnection:
             return conn
         else:
             raise NotImplementedError("Only SQLite is currently supported.")
+
+    def get_engine(self) -> Engine:
+        """Get SQLAlchemy engine"""
+        if not self.use_sqlite:
+            raise NotImplementedError("Only SQLite is currently supported.")
+
+        if self.engine is None:
+            raise RuntimeError("SQLAlchemy engine not initialized.")
+
+        return self.engine
+
+    def get_session(self) -> Session:
+        """Get a new SQLAlchemy session"""
+        if not self.use_sqlite:
+            raise NotImplementedError("Only SQLite is currently supported.")
+
+        if self.SessionLocal is None:
+            raise RuntimeError("SQLAlchemy session factory not initialized.")
+
+        return self.SessionLocal()
+
+    def get_session_factory(self):
+        """Get the session factory for dependency injection"""
+        return self.SessionLocal
 
 
 database = DatabaseConnection()

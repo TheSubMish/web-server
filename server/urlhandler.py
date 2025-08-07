@@ -111,8 +111,6 @@ class UrlHandler:
         # Replace untyped parameters like <id> (default to str)
         pattern = re.sub(r"<(\w+)>", r"(?P<\1>[^/]+)", pattern)
 
-        print(pattern)
-
         return f"^{pattern}$"
 
     def _extract_param_types(self, path: str) -> Dict[str, str]:
@@ -177,8 +175,6 @@ class UrlHandler:
     ) -> Response:
         try:
 
-            print(self.regex_routes)
-
             if path in self.routes:
                 route_info: Dict[str, Any] = self.routes[path]
                 if method in route_info["methods"]:
@@ -191,9 +187,7 @@ class UrlHandler:
                 match: Optional[re.Match[str]] = re.match(pattern, path)
                 if match:
                     if method in route_info["methods"]:
-                        print()
-                        print(route_info)
-                        print()
+
                         url_params = match.groupdict()
 
                         if "param_types" in route_info:
@@ -210,7 +204,6 @@ class UrlHandler:
             return self.not_found(request)
 
         except Exception as e:
-            print(f"Error handling request: {e}")
             return self.server_error(request)
 
     def _convert_to_response(self, result: Any) -> Response:

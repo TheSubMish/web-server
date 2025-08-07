@@ -52,8 +52,6 @@ url_handler.post("/contact", contact_handler)
 def user_update_handler(request: Request, id: str) -> JSONResponse:
     data = request.data
 
-    print(data)
-
     if id:
         return JSONResponse(
             data={"message": f"User {id} updated successfully", "data": data},

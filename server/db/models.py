@@ -1,6 +1,5 @@
 from contextlib import contextmanager
-from database import Base, database
-from sqlalchemy.orm import Session
+from database import Base, database, DatabaseConnection
 from sqlalchemy import Column, Integer
 from typing import Any, List, Optional
 
@@ -24,7 +23,7 @@ class ModelManager:
     """
 
     def __init__(self) -> None:
-        self.database = database
+        self.database : DatabaseConnection = database
 
     @contextmanager
     def get_session(self):
@@ -96,8 +95,6 @@ class Model(Base):
         __init__(name, fields): Initializes the model with a name and fields.
         __repr__(): Returns a string representation of the model instance.
         __str__(): Returns a human-readable string for the model instance.
-        save(session): Saves the model to the database.
-        delete(session): Deletes the model from the database.
     """
 
     __abstract__ = True
@@ -114,15 +111,5 @@ class Model(Base):
 
     def __str__(self) -> str:
         return f"Model: {self.name} with fields"
-
-    def save(self, session: Session) -> None:
-        """Save the model instance to the database"""
-        session.add(self)
-        session.flush()
-
-    def delete(self, session: Session) -> None:
-        """Delete the model instance from the database"""
-        session.delete(self)
-        session.flush()
 
     objects = ModelManager()

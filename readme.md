@@ -121,4 +121,4 @@ Contributions and feedback are welcome. Please open issues or pull requests to h
 
 ## License
 
-To be determined.
+This project is licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).

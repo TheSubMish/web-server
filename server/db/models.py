@@ -23,7 +23,7 @@ class ModelManager:
     """
 
     def __init__(self) -> None:
-        self.database : DatabaseConnection = database
+        self.database: DatabaseConnection = database
 
     @contextmanager
     def get_session(self):
@@ -38,35 +38,43 @@ class ModelManager:
         finally:
             session.close()
 
-    def save(self, name: str, fields: Any) -> "Model":
-        model = Model(name=name, fields=fields)
+    def save(self, id: int, fields: Any) -> "Model":
+
+        model = Model(id=id, **fields)
         with self.get_session() as session:
-            model.save(session)
+            session.add(model)
+            session.commit()
         return model
 
-    def create(self, name: str, fields: Any) -> "Model":
-        """Alias for save method to create a new model instance"""
-        return self.save(name, fields)
+    def create(self, fields: Any) -> "Model":
+        """Create a new model instance using SQLAlchemy and save it to the database"""
+        model = Model(**fields)
+        with self.get_session() as session:
+            session.add(model)
+            session.commit()
+            session.refresh(model)
+        return model
 
     def get(self, model_id: int) -> Optional["Model"]:
         with self.get_session() as session:
-            model = session.query(Model).filter(Model.id == model_id).first()
+            model = session.query(Model).filter_by(id=model_id).first()
             return model
 
     def update(self, model_id: int, **kwargs: Any) -> Optional["Model"]:
         with self.get_session() as session:
-            model = session.query(Model).filter(Model.id == model_id).first()
+            model = session.query(Model).filter_by(id=model_id).first()
             if model:
                 for key, value in kwargs.items():
                     setattr(model, key, value)
-                model.save(session)
+                session.add(model)
+                session.commit()
             return model
 
     def delete(self, model_id: int) -> bool:
         with self.get_session() as session:
-            model = session.query(Model).filter(Model.id == model_id).first()
+            model = session.query(Model).filter_by(id=model_id).first()
             if model:
-                model.delete(session)
+                session.delete(model)
                 return True
             return False
 
@@ -76,6 +84,14 @@ class ModelManager:
             for key, value in kwargs.items():
                 query = query.filter(getattr(Model, key) == value)
             results = query.all()
+            for result in results:
+                session.expunge(result)
+            return results
+
+    def all(self) -> List["Model"]:
+        """Retrieve all model instances"""
+        with self.get_session() as session:
+            results = session.query(Model).all()
             for result in results:
                 session.expunge(result)
             return results
@@ -101,15 +117,15 @@ class Model(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
-    def __init__(self, name: str, fields: Any) -> None:
+    def __init__(self, id: int, fields: Any) -> None:
         super().__init__()
-        self.name = name
+        self.id = id
         self.fields = fields
 
     def __repr__(self) -> str:
-        return f"Model(name={self.name}, fields={self.fields})"
+        return f"Model(id={self.id}, fields={self.fields})"
 
     def __str__(self) -> str:
-        return f"Model: {self.name} with fields"
+        return f"Model: {self.id} with fields"
 
     objects = ModelManager()

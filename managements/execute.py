@@ -5,9 +5,11 @@ from typing import List, Callable, Optional
 try:
     from managements.command.runserver import run_server
     from managements.command.makemigrations import makemigrations
+    from managements.command.migrate import migrate
 except ImportError:
     run_server: Optional[Callable[[str, int], None]] = None
     makemigrations: Optional[Callable[[], None]] = None
+    migrate: Optional[Callable[[], None]] = None
 
 
 class ExecuteCommand:
@@ -42,6 +44,8 @@ class ExecuteCommand:
         }
         if makemigrations is not None:
             commands["makemigrations"] = makemigrations
+        if migrate is not None:
+            commands["migrate"] = migrate
 
         if self.args[1] not in commands.keys():
             print(f"Unknown command: {self.args[1]}")

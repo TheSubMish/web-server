@@ -10,7 +10,7 @@ except ImportError:
 
 
 @start_with_reloader
-def run_server(host: str = "127.0.0.1", port: int = 8000) -> None:
+def runserver(host: str = "127.0.0.1", port: int = 8000) -> None:
     def wsgi_app(environ, start_response):
         def start_response_wrapper(status, headers, exc_info=None):
             return start_response(status, headers)

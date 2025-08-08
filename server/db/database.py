@@ -14,7 +14,14 @@ class DatabaseConnection:
     """
     DatabaseConnection manages database connectivity for the application.
     Attributes:
-        use_sqlite (bool): Indicates whether SQLite should be used as the database backend.
+        db_file (str): The SQLite database file name.
+
+        use_sqlite (bool): Indicates whether SQLite is used as the database backend.
+
+        engine (Optional[Engine]): SQLAlchemy engine instance for database operations.
+
+        SessionLocal: SQLAlchemy session factory for creating sessions.
+
     Methods:
         __init__():
             Initializes the DatabaseConnection instance and determines the database backend.
@@ -24,6 +31,24 @@ class DatabaseConnection:
             Creates and returns a SQLite connection to the specified database file.
         get_connection():
             Returns a database connection based on the selected backend. Currently, only SQLite is supported.
+
+        _create_sqlite_connection(db_file: str) -> sqlite3.Connection | None:
+            Creates a SQLite connection to the specified database file. Returns None if connection fails.
+
+        _create_sqlalchemy_engine(db_file: str) -> Engine:
+            Creates and returns a SQLAlchemy engine for the specified SQLite database file.
+
+        get_connection() -> sqlite3.Connection:
+            Returns a SQLite database connection. Raises an error if connection fails or backend is unsupported.
+
+        get_engine() -> Engine:
+            Returns the SQLAlchemy engine. Raises an error if not initialized or backend is unsupported.
+
+        get_session() -> Session:
+            Returns a new SQLAlchemy session. Raises an error if session factory is not initialized or backend is unsupported.
+
+        get_session_factory():
+            Returns the SQLAlchemy session factory for dependency injection.
     """
 
     def __init__(self) -> None:
@@ -39,10 +64,9 @@ class DatabaseConnection:
             )
 
     def _check_db(self) -> bool:
-
         try:
             import main
-        except ImportError as e:
+        except ImportError:
             main = None
 
         if main is not None and hasattr(main, "USE_SQLITE"):
@@ -109,4 +133,3 @@ class DatabaseConnection:
 
 
 database = DatabaseConnection()
-db_connection = database.get_connection()

@@ -1,5 +1,5 @@
 from server.db.models import Model
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, String
 
 
 class ContactModel(Model):

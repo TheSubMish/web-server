@@ -66,18 +66,18 @@ The server will start and be accessible at `http://127.0.0.1:8000/` by default.
    ```python
    from server.middleware import MiddlewareHandler
    class ResponseTimeMiddleware(MiddlewareHandler):
-    def __init__(self, app: Any) -> None:
+      def __init__(self, app: Any) -> None:
         self.app = app
 
-    def __call__(self, environ: dict, start_response: Any) -> Any:
-        import time
+      def __call__(self, environ: dict, start_response: Any) -> Any:
+         import time
 
-        start_time = time.time()
-        response_body = self.app(environ, start_response)
-        duration = time.time() - start_time
+         start_time = time.time()
+         response_body = self.app(environ, start_response)
+         duration = time.time() - start_time
 
-        print(f"Response Time: {duration:.4f} seconds")
-        return response_body
+         print(f"Response Time: {duration:.4f} seconds")
+         return response_body
    ```
 
    **Append to list**
@@ -87,6 +87,21 @@ The server will start and be accessible at `http://127.0.0.1:8000/` by default.
       MiddlewareHandler,
       ResponseTimeMiddleware,
    ]
+   ```
+
+7. **Create Models**
+
+   ```python
+   from server.db.models import Model
+   from sqlalchemy import Column, String
+
+   class ContactModel(Model):
+
+      __tablename__ = "contacts"
+
+      name = Column(String, nullable=False)
+      email = Column(String, nullable=False)
+      message = Column(String, nullable=False)
    ```
 
 ## Contributing

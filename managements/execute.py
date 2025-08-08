@@ -4,8 +4,10 @@ from typing import List, Callable, Optional
 # Ensure run_server is properly imported and defined
 try:
     from managements.command.runserver import run_server
+    from managements.command.makemigrations import makemigrations
 except ImportError:
     run_server: Optional[Callable[[str, int], None]] = None
+    makemigrations: Optional[Callable[[], None]] = None
 
 
 class ExecuteCommand:
@@ -38,6 +40,8 @@ class ExecuteCommand:
         commands: dict[str, Callable[[], None]] = {
             "runserver": self._run_server,
         }
+        if makemigrations is not None:
+            commands["makemigrations"] = makemigrations
 
         if self.args[1] not in commands.keys():
             print(f"Unknown command: {self.args[1]}")

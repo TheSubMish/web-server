@@ -104,6 +104,11 @@ The server will start and be accessible at `http://127.0.0.1:8000/` by default.
       message = Column(String, nullable=False)
    ```
 
+8. **Make migrations files**
+   ```bash
+   python manage.py makemigrations
+   ```
+
 ## Contributing
 
 Contributions and feedback are welcome. Please open issues or pull requests to help shape the project.

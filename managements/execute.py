@@ -1,7 +1,7 @@
 import sys
 import importlib
 import pkgutil
-from typing import List, Callable, Optional, Dict
+from typing import List, Callable, Dict
 
 
 def discover_commands(package: str) -> Dict[str, Callable]:

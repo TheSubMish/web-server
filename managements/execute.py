@@ -19,6 +19,26 @@ def discover_commands(package: str) -> Dict[str, Callable]:
 
 
 class ExecuteCommand:
+    """
+    Handles the execution of management commands for the web server.
+
+    Args:
+        args (List[str]): List of command-line arguments.
+
+    Attributes:
+        args (List[str]): The command-line arguments.
+        commands (Dict[str, Callable]): Mapping of command names to their corresponding callables.
+
+    Methods:
+        execute():
+            Executes the specified command from the command-line arguments.
+            Prints an error and exits if the command is not provided or unknown.
+
+        _run_server():
+            Special handler for the 'runserver' command.
+            Dynamically imports and runs the server with optional host and port arguments.
+            Prints an error and exits if the run_server function is not found or not callable.
+    """
 
     def __init__(self, args: List[str]) -> None:
         self.args: List[str] = args

@@ -104,13 +104,20 @@ The server will start and be accessible at `http://127.0.0.1:8000/` by default.
       message = Column(String, nullable=False)
    ```
 
-8. **Make migrations files**
+8. **Register models base.py**
+
+   ```python
+   from models import ContactModel
+   ```
+
+9. **Make migrations files**
 
    ```bash
    python manage.py makemigrations
    ```
 
-9. **Apply migrations using migrate command**
+10. **Apply migrations using migrate command**
+
    ```bash
    python manage.py migrate
    ```

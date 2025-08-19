@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from database import Base, database, DatabaseConnection
+from server.db.database import Base, database, DatabaseConnection
 from sqlalchemy import Column, Integer
 from typing import Any, List, Optional
 
